@@ -71,12 +71,14 @@ class Grid(list[int | None]):
                 lambda x: " " if x is None else str(x),
                 self[self.size * i:self.size * (i + 1)]
             )
-            result += f'|{" ".join(row)}|\n'
+            result += f'|{" ".join(row)}|'
+            if i != self.size - 1:
+                result += '\n'
         return result
 
     def move(self, direction: Direction) -> None:
         new_empty_position = [
-            self.empty_position[i] - direction.value[i]
+            self.empty_position[i] + direction.value[i]
             for i in range(2)
         ]
         if -1 in new_empty_position or 3 in new_empty_position:
