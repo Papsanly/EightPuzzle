@@ -56,9 +56,9 @@ class Grid(list[int | None]):
             setitem(self._position_to_index(key.value[0], key.value[1]), value)
         setitem(self._position_to_index(*key), value)
 
-    def __getitem__(self, key: Iterable[int] | GridPosition | slice) -> int | Sequence[int]:
+    def __getitem__(self, key: Iterable[int] | GridPosition | slice | int) -> int | Sequence[int]:
         getitem = super(Grid, self).__getitem__
-        if isinstance(key, slice):
+        if isinstance(key, slice | int):
             return getitem(key)
         if isinstance(key, GridPosition):
             return getitem(self._position_to_index(key.value[0], key.value[1]))
@@ -87,3 +87,9 @@ class Grid(list[int | None]):
         self[self.empty_position] = move_value
         self[new_empty_position] = None
         self.empty_position = new_empty_position
+
+
+if __name__ == '__main__':
+    grid = Grid.generate_random()
+    print(grid)
+    print(grid[GridPosition.CENTER])
