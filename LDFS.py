@@ -32,7 +32,7 @@ class LDFS(SearchAlgorithm):
             if self._is_in_visited_states(grid_copy, depth):
                 continue
 
-            self.visited_states[tuple(grid_copy)] = depth
+            self.states_in_memory['visited'][tuple(grid_copy)] = depth
             self.solution.append(direction)
             self._solve_recursive(grid_copy, depth + 1)
 

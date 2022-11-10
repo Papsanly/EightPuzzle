@@ -1,11 +1,10 @@
 from Grid import Grid
-from noninformed_search import LDFS
-from informed_search import AStar
+from LDFS import LDFS
+from AStar import AStar
 
 
 def main():
     grid = Grid.generate_solvable(400)
-    grid = Grid((4, 8, 2, 5, None, 1, 3, 6, 7))
     print('\nGenerated grid:\n')
     print(grid, '\n')
     print('Solving...')
@@ -16,7 +15,7 @@ def main():
         print(f'Solution depth: {len(solution)}')
         print(f'Iterations:', algorithm.iterations)
         print(f'Dead ends:', algorithm.dead_ends)
-        print(f'Visited states:', len(algorithm.unique_visited_states), '\n')
+        print(f'Visited states:', len(algorithm.visited_states), '\n')
         print('Solution:\n')
         for direction in solution:
             grid.move(direction)
