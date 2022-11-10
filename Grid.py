@@ -24,7 +24,7 @@ class Direction(Enum):
     RIGHT = (0, 1)
 
 
-class Grid(list[int | None]):
+class Grid(tuple[int | None]):
     size = 3
 
     @classmethod
@@ -41,7 +41,7 @@ class Grid(list[int | None]):
         while i < depth:
             direction = choice(tuple(Direction))
             try:
-                grid.move(direction)
+                grid = grid.move(direction)
             except ImpossibleMove:
                 pass
             else:
@@ -53,28 +53,22 @@ class Grid(list[int | None]):
         return index // cls.size, index % cls.size
 
     @classmethod
-    def _position_to_index(cls, row: int, column: int) -> int:
-        return cls.size * row + column
+    def _position_to_index(cls, position: Sequence[int]) -> int:
+        return cls.size * position[0] + position[1]
 
-    def __init__(self, values: Iterable[int | None]) -> None:
-        super().__init__()
-        for value in values:
-            self.append(value)
+    def __new__(cls, values: Iterable[int | None]):
+        return super().__new__(cls, tuple(values))
+
+    def __init__(self, values) -> None:
         self.empty_position = self._index_to_position(self.index(None))
 
-    def __setitem__(self, key: Iterable[int] | GridPosition, value: int | None) -> None:
-        setitem = super(Grid, self).__setitem__
-        if isinstance(key, GridPosition):
-            setitem(self._position_to_index(key.value[0], key.value[1]), value)
-        setitem(self._position_to_index(*key), value)
-
-    def __getitem__(self, key: Iterable[int] | GridPosition | slice | int) -> int | Sequence[int]:
+    def __getitem__(self, key: Sequence[int] | GridPosition | slice | int) -> int | Sequence[int]:
         getitem = super(Grid, self).__getitem__
         if isinstance(key, slice | int):
             return getitem(key)
         if isinstance(key, GridPosition):
-            return getitem(self._position_to_index(key.value[0], key.value[1]))
-        return getitem(self._position_to_index(*key))
+            return getitem(self._position_to_index((key.value[0], key.value[1])))
+        return getitem(self._position_to_index(key))
 
     def __str__(self) -> str:
         result = ''
@@ -88,7 +82,8 @@ class Grid(list[int | None]):
                 result += '\n'
         return result
 
-    def move(self, direction: Direction) -> None:
+    def move(self, direction: Direction) -> Grid:
+        result = list(self)
         new_empty_position = [
             self.empty_position[i] + direction.value[i]
             for i in range(2)
@@ -96,9 +91,9 @@ class Grid(list[int | None]):
         if -1 in new_empty_position or 3 in new_empty_position:
             raise ImpossibleMove('Cannot move in this direction')
         move_value = self[new_empty_position]
-        self[self.empty_position] = move_value
-        self[new_empty_position] = None
-        self.empty_position = new_empty_position
+        result[self._position_to_index(self.empty_position)] = move_value
+        result[self._position_to_index(new_empty_position)] = None
+        return Grid(result)
 
-    def check_correct_position(self) -> bool:
+    def is_solved(self) -> bool:
         return tuple(self) == tuple(range(1, 9)) + (None,)

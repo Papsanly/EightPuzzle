@@ -10,6 +10,7 @@ class AlgortithmStats:
     execution_time_start: int = None
     execution_time: int = None
     total_visited_states: int = 1
+    max_states_in_memory: int = 1
 
 
 class SearchAlgorithm:
@@ -18,13 +19,9 @@ class SearchAlgorithm:
         self.grid = grid
         self.time_limit = time_limit
         self.memory_limit = memory_limit
-        self.states_in_memory = {'visited': {tuple(grid): 0}}
+        self.states_in_memory = {}
         self.solution = []
         self.stats = AlgortithmStats()
-
-    def _is_in_visited_states(self, grid: Grid, depth: int):
-        visited_depth = self.states_in_memory['visited'].get(tuple(grid))
-        return visited_depth is not None and depth >= visited_depth
 
     def solve(self):
         self.stats.execution_time_start = time.time()
@@ -46,6 +43,6 @@ class SearchAlgorithm:
             raise OutOfMemory
         if time.time() - self.stats.execution_time_start > self.time_limit:
             raise TimeOut
-        if grid.check_correct_position():
+        if grid.is_solved():
             raise SolutionFound
         self.stats.iterations += 1
