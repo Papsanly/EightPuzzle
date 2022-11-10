@@ -8,11 +8,11 @@ from exceptions import TimeOut, OutOfMemory, SolutionFound
 
 @dataclass
 class AlgortithmStats:
+    total_visited_states: set[Grid]
     iterations: int = 0
     dead_ends: int = 0
     execution_time_start: int = None
     execution_time: int = None
-    total_visited_states: list[Grid] = field(default_factory=list)
     max_states_in_memory: int = 1
 
 
@@ -25,7 +25,7 @@ class SearchAlgorithm:
         self.states_in_memory = {}
         self.solution = []
         if stats:
-            self.stats = AlgortithmStats()
+            self.stats = AlgortithmStats({grid})
         else:
             self.stats = None
 
