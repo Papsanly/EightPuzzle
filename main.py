@@ -4,7 +4,7 @@ from AStar import AStar
 
 
 def main():
-    grid = Grid((1, 5, None, 7, 8, 6, 2, 3, 4))
+    grid = Grid.generate_solvable(400)
     print('\nGenerated grid:\n')
     print(grid, '\n')
     print('Solving...')
@@ -15,7 +15,8 @@ def main():
         print(f'Solution depth: {len(solution)}')
         print(f'Iterations:', algorithm.stats.iterations)
         print(f'Dead ends:', algorithm.stats.dead_ends)
-        print(f'Visited states:', algorithm.stats.total_visited_states, '\n')
+        print(f'Total visited states:', algorithm.stats.total_visited_states)
+        print(f'States in memory:', algorithm.stats.max_states_in_memory, '\n')
         print('Solution:\n')
         for direction in solution:
             grid = grid.move(direction)
