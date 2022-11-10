@@ -1,4 +1,3 @@
-from copy import copy
 from Grid import Grid, Direction
 from SearchAlgorithm import SearchAlgorithm
 from exceptions import ImpossibleMove
@@ -11,9 +10,10 @@ class LDFS(SearchAlgorithm):
             grid: Grid,
             depth_limit: int,
             time_limit: float = 1800,
-            memory_limit: int = 1024 ** 3
+            memory_limit: int = 1024 ** 3,
+            stats: bool = True
     ) -> None:
-        super().__init__(grid, time_limit, memory_limit)
+        super().__init__(grid, time_limit, memory_limit, stats)
         self.depth_limit = depth_limit
         self.states_in_memory['visited'] = {tuple(grid)}
 

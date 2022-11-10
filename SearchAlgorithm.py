@@ -1,6 +1,6 @@
 import sys
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from Grid import Grid
 from exceptions import TimeOut, OutOfMemory, SolutionFound
@@ -11,27 +11,26 @@ class AlgortithmStats:
     total_visited_states: set[Grid]
     iterations: int = 0
     dead_ends: int = 0
-    execution_time_start: int = None
     execution_time: int = None
     max_states_in_memory: int = 1
 
 
 class SearchAlgorithm:
 
-    def __init__(self, grid: Grid, time_limit: float, memory_limit: int = 1024 ** 3, stats: bool = True):
+    def __init__(self, grid: Grid, time_limit: float, memory_limit: int, stats: bool):
         self.grid = grid
         self.time_limit = time_limit
         self.memory_limit = memory_limit
         self.states_in_memory = {}
         self.solution = []
+        self.execution_time_start = None
         if stats:
             self.stats = AlgortithmStats({grid})
         else:
             self.stats = None
 
     def solve(self):
-        if self.stats:
-            self.stats.execution_time_start = time.time()
+        self.execution_time_start = time.time()
         try:
             self._solve_recursive(self.grid, 0)
         except TimeOut:
@@ -41,7 +40,7 @@ class SearchAlgorithm:
         except SolutionFound:
             print('Solution found')
             if self.stats:
-                self.stats.execution_time = time.time() - self.stats.execution_time_start
+                self.stats.execution_time = time.time() - self.execution_time_start
             return self.solution
         else:
             print('Solution not found')
@@ -49,7 +48,7 @@ class SearchAlgorithm:
     def _solve_recursive(self, grid: Grid, depth: int):
         if sys.getsizeof(self.states_in_memory) > self.memory_limit:
             raise OutOfMemory
-        if time.time() - self.stats.execution_time_start > self.time_limit:
+        if time.time() - self.execution_time_start > self.time_limit:
             raise TimeOut
         if grid.is_solved():
             raise SolutionFound
