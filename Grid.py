@@ -2,10 +2,7 @@ from __future__ import annotations
 from enum import Enum
 from random import shuffle, choice
 from typing import Iterable, Sequence
-
-
-class ImpossibleMove(Exception):
-    pass
+from exceptions import ImpossibleMove
 
 
 class GridPosition(Enum):
