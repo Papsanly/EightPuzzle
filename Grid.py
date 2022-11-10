@@ -1,6 +1,7 @@
+from __future__ import annotations
 from enum import Enum
-from random import shuffle
-from typing import Self, Iterable, Sequence
+from random import shuffle, choice
+from typing import Iterable, Sequence
 
 
 class ImpossibleMove(Exception):
@@ -30,11 +31,25 @@ class Grid(list[int | None]):
     size = 3
 
     @classmethod
-    def generate_random(cls) -> Self:
+    def generate_random(cls) -> Grid:
         length = cls.size * cls.size
         values = [None] + list(range(1, length))
         shuffle(values)
         return Grid(values)
+
+    @classmethod
+    def generate_solvable(cls, depth: int = 20) -> Grid:
+        grid = Grid(list(range(1, 9)) + [None])
+        i = 0
+        while i < depth:
+            direction = choice(tuple(Direction))
+            try:
+                grid.move(direction)
+            except ImpossibleMove:
+                pass
+            else:
+                i += 1
+        return grid
 
     @classmethod
     def _index_to_position(cls, index: int) -> Sequence[int]:
@@ -88,8 +103,5 @@ class Grid(list[int | None]):
         self[new_empty_position] = None
         self.empty_position = new_empty_position
 
-
-if __name__ == '__main__':
-    grid = Grid.generate_random()
-    print(grid)
-    print(grid[GridPosition.CENTER])
+    def check_correct_position(self) -> bool:
+        return tuple(self) == tuple(range(1, 9)) + (None,)
