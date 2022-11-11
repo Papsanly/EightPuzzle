@@ -32,7 +32,7 @@ class SearchAlgorithm:
     def solve(self):
         self.execution_time_start = time.time()
         try:
-            self._solve_recursive(self.grid, 0)
+            self._solve_internal(self.grid, 0)
         except TimeOut:
             print(f'Execution time exceeded {self.time_limit} second(s).')
         except OutOfMemory:
@@ -45,7 +45,7 @@ class SearchAlgorithm:
         else:
             print('Solution not found')
 
-    def _solve_recursive(self, grid: Grid, depth: int):
+    def _solve_internal(self, grid: Grid, depth: int):
         if sys.getsizeof(self.states_in_memory) > self.memory_limit:
             raise OutOfMemory
         if time.time() - self.execution_time_start > self.time_limit:

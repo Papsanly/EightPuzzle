@@ -15,14 +15,17 @@ class LDFS(SearchAlgorithm):
     ) -> None:
         super().__init__(grid, time_limit, memory_limit, stats)
         self.depth_limit = depth_limit
-        self.states_in_memory['visited'] = {tuple(grid)}
+        self.states_in_memory['visited'] = {grid}
 
-    def _solve_recursive(self, grid: Grid, depth: int) -> None:
-        super()._solve_recursive(grid, depth)
-        if depth > self.depth_limit:
+    def _solve_internal(self, grid: Grid, depth: int) -> None:
+        super()._solve_internal(grid, depth)
+        if depth >= self.depth_limit:
             if self.stats:
                 self.stats.dead_ends += 1
             return
+
+        if depth == 23:
+            pass
 
         child_count = 0
         for direction in Direction:
@@ -37,7 +40,7 @@ class LDFS(SearchAlgorithm):
             if self.stats:
                 self.stats.total_visited_states.add(new_grid)
             self.solution.append(direction)
-            self._solve_recursive(new_grid, depth + 1)
+            self._solve_internal(new_grid, depth + 1)
 
             self.solution.pop()
             self.states_in_memory['visited'].remove(new_grid)

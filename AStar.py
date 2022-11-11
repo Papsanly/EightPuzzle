@@ -9,10 +9,11 @@ class AStar(SearchAlgorithm):
             self,
             grid: Grid,
             time_limit: float = 1800,
-            memory_limit: int = 1024 ** 3
+            memory_limit: int = 1024 ** 3,
+            stats: bool = True
     ) -> None:
-        super().__init__(grid, time_limit, memory_limit)
-        self.open_states = []
+        super().__init__(grid, time_limit, memory_limit, stats)
+        self.states_in_memory['open'] = {grid}
 
-    def _solve_recursive(self, grid: Grid, depth: int):
-        super()._solve_recursive(grid, depth)
+    def _solve_internal(self, grid: Grid, depth: int = 0):
+        super()._solve_internal(grid, 0)

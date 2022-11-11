@@ -1,16 +1,16 @@
-import time
-
 from Grid import Grid
 from LDFS import LDFS
 from AStar import AStar
 
 
 def main():
+    # grid = Grid((7, 1, 3, 6, None, 8, 2, 5, 4))
     grid = Grid.generate_solvable(400)
+    grid = Grid((1, 2, 3, 4, 5, 6, 7, None, 8))
     print('\nGenerated grid:\n')
     print(grid, '\n')
     print('Solving...')
-    algorithm = LDFS(grid, 22)
+    algorithm = LDFS(grid, 10)
     solution = algorithm.solve()
     if solution is not None:
         if algorithm.stats:
