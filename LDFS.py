@@ -1,6 +1,7 @@
+from typing import TypedDict
+
 from Grid import Grid, Direction
 from SearchAlgorithm import SearchAlgorithm
-from exceptions import ImpossibleMove
 
 
 class LDFS(SearchAlgorithm):
@@ -15,7 +16,7 @@ class LDFS(SearchAlgorithm):
     ) -> None:
         super().__init__(grid, time_limit, memory_limit, stats)
         self.depth_limit = depth_limit
-        self.states_in_memory['visited'] = {grid}
+        self._states_in_memory['visited'] = {grid}
 
     def _solve_internal(self, grid: Grid, depth: int) -> None:
         super()._solve_internal(grid, depth)
@@ -24,30 +25,17 @@ class LDFS(SearchAlgorithm):
                 self.stats.dead_ends += 1
             return
 
-        if depth == 23:
-            pass
-
         child_count = 0
-        for direction in Direction:
-            try:
-                new_grid = grid.move(direction)
-            except ImpossibleMove:
-                continue
-            if new_grid in self.states_in_memory['visited']:
-                continue
-
-            self.states_in_memory['visited'].add(new_grid)
-            if self.stats:
-                self.stats.total_visited_states.add(new_grid)
+        for new_grid, direction in self._get_extensions(grid):
             self.solution.append(direction)
             self._solve_internal(new_grid, depth + 1)
 
             self.solution.pop()
-            self.states_in_memory['visited'].remove(new_grid)
+            self._states_in_memory['visited'].remove(new_grid)
             child_count += 1
 
         if self.stats:
             if child_count == 0:
                 self.stats.dead_ends += 1
-            if self.stats.max_states_in_memory < len(self.states_in_memory['visited']):
-                self.stats.max_states_in_memory = len(self.states_in_memory['visited'])
+            if self.stats.max_states_in_memory < len(self._states_in_memory['visited']):
+                self.stats.max_states_in_memory = len(self._states_in_memory['visited'])

@@ -1,7 +1,7 @@
 from __future__ import annotations
 from enum import Enum
-from random import shuffle, choice
-from typing import Iterable, Sequence
+from random import shuffle, choice, randint
+from typing import Sequence
 from exceptions import ImpossibleMove
 
 
@@ -27,16 +27,22 @@ class Direction(Enum):
 class Grid(tuple[int | None]):
     size = 3
 
-    @classmethod
-    def generate_random(cls) -> Grid:
-        length = cls.size * cls.size
-        values = [None] + list(range(1, length))
-        shuffle(values)
-        return Grid(values)
+    def __new__(cls, *values: int | None):
+        return super().__new__(cls, tuple(values))
+
+    def __init__(self, *values: int | None) -> None:
+        self.empty_position = self._index_to_position(self.index(None))
 
     @classmethod
-    def generate_solvable(cls, depth: int = 20) -> Grid:
-        grid = Grid(list(range(1, 9)) + [None])
+    def generate_random(cls) -> Grid:
+        values = [None] + list(range(1, cls.size * cls.size))
+        shuffle(values)
+        return Grid(*values)
+
+    @classmethod
+    def generate_solvable(cls, min_depth: int = 200, max_depth: int = 400) -> Grid:
+        depth = randint(min_depth, max_depth)
+        grid = Grid(*range(1, cls.size * cls.size), None)
         i = 0
         while i < depth:
             direction = choice(tuple(Direction))
@@ -56,12 +62,6 @@ class Grid(tuple[int | None]):
     def _position_to_index(cls, position: Sequence[int]) -> int:
         return cls.size * position[0] + position[1]
 
-    def __new__(cls, values: Iterable[int | None]):
-        return super().__new__(cls, tuple(values))
-
-    def __init__(self, values) -> None:
-        self.empty_position = self._index_to_position(self.index(None))
-
     def __getitem__(self, key: Sequence[int] | GridPosition | slice | int) -> int | Sequence[int]:
         getitem = super(Grid, self).__getitem__
         if isinstance(key, slice | int):
@@ -73,11 +73,17 @@ class Grid(tuple[int | None]):
     def __str__(self) -> str:
         result = ''
         for i in range(self.size):
+            result += '|'
             row = map(
                 lambda x: " " if x is None else str(x),
                 self[self.size * i:self.size * (i + 1)]
             )
-            result += f'|{" ".join(row)}|'
+            for j, value in enumerate(row):
+                justify = len(str(self.size ** 2))
+                if j != 0:
+                    justify += 1
+                result += str(value).rjust(justify)
+            result += '|'
             if i != self.size - 1:
                 result += '\n'
         return result
@@ -88,12 +94,12 @@ class Grid(tuple[int | None]):
             self.empty_position[i] + direction.value[i]
             for i in range(2)
         ]
-        if -1 in new_empty_position or 3 in new_empty_position:
+        if -1 in new_empty_position or self.size in new_empty_position:
             raise ImpossibleMove('Cannot move in this direction')
         move_value = self[new_empty_position]
         result[self._position_to_index(self.empty_position)] = move_value
         result[self._position_to_index(new_empty_position)] = None
-        return Grid(result)
+        return Grid(*result)
 
     def is_solved(self) -> bool:
-        return tuple(self) == tuple(range(1, 9)) + (None,)
+        return tuple(self) == tuple(range(1, self.size * self.size)) + (None,)
