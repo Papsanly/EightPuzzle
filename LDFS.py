@@ -1,6 +1,4 @@
-from typing import TypedDict
-
-from Grid import Grid, Direction
+from Grid import Grid
 from SearchAlgorithm import SearchAlgorithm
 
 
